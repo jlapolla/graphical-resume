@@ -27,6 +27,7 @@ endef
 
 $(eval $(call $(d)template,live-blocks/live-blocks.js,dist/js/live-blocks.js))
 $(eval $(call $(d)template,provisions/angular/angular-1.4.9.min.js,dist/js/angular.js))
+$(eval $(call $(d)template,index.html,dist/index.html))
 $(eval $($(d)template) :=)
 
 # Main template
@@ -34,7 +35,8 @@ define $(d)template
 
 .PHONY: $(d)dist
 $(call helpdoc,$(d)dist)
-$(d)dist: $(addsuffix .js,$(addprefix $(d)dist/js/,live-blocks angular))
+$(d)dist: $(addsuffix .js,$(addprefix $(d)dist/js/,live-blocks angular)) \
+  $(addprefix $(d)dist/,index.html)
 
 .PHONY: $(d)clean
 $(call helpdoc,$(d)clean)
