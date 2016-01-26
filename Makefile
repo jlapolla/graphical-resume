@@ -15,10 +15,33 @@ endif # End check for provisions module
 include require.mk
 $(call ,$(call require,$(addsuffix /Makefile,$(d)live-blocks $(d)provisions)))
 
+# Include watch.mk utility
+include watch.mk
+
+# File copy rules
+define $(d)template
+$(d)$(2): $(d)$(1)
+	mkdir -p $(dir $(d)$(2))
+	cp $(d)$(1) $(d)$(2)
+endef
+
+$(eval $(call $(d)template,live-blocks/live-blocks.js,dist/js/live-blocks.js))
+$(eval $(call $(d)template,provisions/angular/angular-1.4.9.min.js,dist/js/angular.js))
+$(eval $($(d)template) :=)
+
 # Main template
 define $(d)template
 
-.DEFAULT_GOAL := help
+.PHONY: $(d)dist
+$(call helpdoc,$(d)dist)
+$(d)dist: $(addsuffix .js,$(addprefix $(d)dist/js/,live-blocks angular))
+
+.PHONY: $(d)clean
+$(call helpdoc,$(d)clean)
+$(d)clean:
+	rm -rf $(d)dist/
+
+$(eval .DEFAULT_GOAL := help)
 
 endef
 
