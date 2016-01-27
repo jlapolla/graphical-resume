@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="graphical.resume">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/">
   <title>Graphical Résumé</title>
 </head>
 <body>
+  <div ui-view></div>
+  <script src="/js/angular.js"></script>
+  <script src="/js/angular-ui-router.js"></script>
+  <script src="/js/live-blocks.js"></script>
+  <script src="/js/app.js"></script>
 </body>
-  <script src="js/angular.js"></script>
-  <script src="js/angular-ui-router.js"></script>
-  <script src="js/live-blocks.js"></script>
 </html>
 

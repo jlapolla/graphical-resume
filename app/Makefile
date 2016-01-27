@@ -3,11 +3,26 @@ $(eval $(d)exports :=)
 
 # File copy rules
 define $(d)template
-$(eval $(d)exports += $(d)$(2))
-$(d)$(2): $(d)$(1)
-	mkdir -p $(dir $(d)$(2)) && cp $(d)$(1) $(d)$(2)
+$(eval $(d)exports += $(d)out/$(2))
+$(d)out/$(2): $(d)$(1)
+	mkdir -p $(dir $(d)out/$(2)) && cp $(d)$(1) $(d)out/$(2)
 endef
-$(eval $(call $(d)template,index.html,out/index.html))
+$(eval $(call $(d)template,index.html,index.html))
+$(eval $(call $(d)template,index.html,demo/index.html))
+$(eval $(call $(d)template,partials/demo.html,partials/demo.html))
+$(eval $(d)template :=)
+
+# Javascript concatenation order
+$(eval $(d)js_order := $(d)angular-config.js)
+$(eval $(d)js_order += $(d)route-config.js)
+
+# Concatenate file rules
+define $(d)template
+$(eval $(d)exports += $(d)out/$(2))
+$(d)out/$(2): $(1)
+	mkdir -p $(dir $(d)out/$(2)) && cat $(1) > $(d)out/$(2)
+endef
+$(eval $(call $(d)template,$(call $(d)js_order),js/app.js))
 $(eval $(d)template :=)
 
 # Main template
@@ -30,4 +45,5 @@ $(eval exports := $(call $(d)exports))
 
 # Clear local variables
 $(eval $(d)exports :=)
+$(eval $(d)js_order :=)
 
