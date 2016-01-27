@@ -12,7 +12,7 @@ ifeq ($(wildcard provisions/Makefile),) # Provisions module is not installed
 endif # End check for provisions module
 
 # List submodules
-$(eval $(d)submodules := $(addsuffix /,live-blocks provisions))
+$(eval $(d)submodules := $(addsuffix /,app live-blocks provisions))
 
 # Require build modules
 include require.mk
@@ -21,17 +21,26 @@ $(eval $(d)subexports := $(call require,$(addprefix $(d),$(addsuffix Makefile,$(
 # Include watch.mk utility
 include watch.mk
 
-# File copy rules
+# app/ submodule export handling
+$(eval $(d)appexports :=)
 define $(d)template
-$(d)$(2): $(d)$(1)
-	mkdir -p $(dir $(d)$(2))
-	cp $(d)$(1) $(d)$(2)
+$(eval $(d)appexports += $(d)dist/$(1))
+$(d)dist/$(1): $(d)app/out/$(1)
+	mkdir -p $(dir $(d)dist/$(1)) && cp $(d)app/out/$(1) $(d)dist/$(1)
 endef
+$(foreach var,$(patsubst $(d)app/out/%,%,$(filter $(d)app/out/%,$(call $(d)subexports))),$(eval $(call $(d)template,$(var))))
+$(eval $(d)template :=)
 
+# Dist file copy rules
+$(eval $(d)distfiles := $(call $(d)appexports))
+define $(d)template
+$(eval $(d)distfiles += $(d)$(2))
+$(d)$(2): $(d)$(1)
+	mkdir -p $(dir $(d)$(2)) && cp $(d)$(1) $(d)$(2)
+endef
 $(eval $(call $(d)template,live-blocks/live-blocks.js,dist/js/live-blocks.js))
 $(eval $(call $(d)template,provisions/angular/angular-1.4.9.min.js,dist/js/angular.js))
 $(eval $(call $(d)template,provisions/ui-router/angular-ui-router-0.2.17.min.js,dist/js/angular-ui-router.js))
-$(eval $(call $(d)template,index.html,dist/index.html))
 $(eval $($(d)template) :=)
 
 # Main template
@@ -39,20 +48,21 @@ define $(d)template
 
 .PHONY: $(d)dist
 $(call helpdoc,$(d)dist)
-$(d)dist: $(addsuffix .js,$(addprefix $(d)dist/js/,live-blocks angular angular-ui-router)) \
-  $(addprefix $(d)dist/,index.html)
+$(d)dist: $(call $(d)distfiles)
 
 .PHONY: $(d)clean
 $(call helpdoc,$(d)clean)
-$(d)clean:
+$(d)clean: $(addprefix $(d),$(addsuffix clean,$(filter-out live-blocks/ provisions/,$(call $(d)submodules))))
 	rm -rf $(d)dist/
 
 $(eval .DEFAULT_GOAL := help)
 endef
-$(eval $($(d)template))
+$(eval $(call $(d)template))
 $(eval $(d)template :=)
 
 # Clear local variables
 $(eval $(d)submodules :=)
 $(eval $(d)subexports :=)
+$(eval $(d)appexports :=)
+$(eval $(d)distfiles :=)
 
